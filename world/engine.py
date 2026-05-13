@@ -27,12 +27,13 @@ class WorldState:
     objects: dict[str, WorldObject]
     doors: dict[str, Door]
     inventory: list[str]
-    agent_room: str
-    agent_x: int
-    agent_y: int
-    agent_facing: str
-    step: int
-    max_steps: int
+    carried: dict[str, WorldObject] = field(default_factory=dict)
+    agent_room: str = ""
+    agent_x: int = 0
+    agent_y: int = 0
+    agent_facing: str = "NORTH"
+    step: int = 0
+    max_steps: int = 200
     visited_rooms: set[str] = field(default_factory=set)
     pending_inspect: Optional[str] = None
 
@@ -90,6 +91,7 @@ class WorldEngine:
             objects=objects,
             doors=doors,
             inventory=[],
+            carried={},
             agent_room=agent["start_room"],
             agent_x=agent["start_x"],
             agent_y=agent["start_y"],
@@ -232,6 +234,7 @@ class WorldEngine:
         if len(s.inventory) >= 6:
             return ActionResult(False, "Inventory is full (max 6 items).")
         s.inventory.append(obj_id)
+        s.carried[obj_id] = obj
         del s.objects[obj_id]
         return ActionResult(True, f"Picked up {obj_id}.")
 
@@ -239,18 +242,21 @@ class WorldEngine:
         s = self.state
         if obj_id not in s.inventory:
             return ActionResult(False, f"{obj_id} is not in your inventory.")
-        obj_type_str = None
-        for prop_key, prop_val in []:
-            pass
         s.inventory.remove(obj_id)
-        obj = WorldObject(
-            obj_id=obj_id,
-            obj_type=ObjectType.KEY,
-            x=s.agent_x,
-            y=s.agent_y,
-            room_id=s.agent_room,
-        )
-        s.objects[obj_id] = obj
+        original = s.carried.pop(obj_id, None)
+        if original is not None:
+            original.x = s.agent_x
+            original.y = s.agent_y
+            original.room_id = s.agent_room
+            s.objects[obj_id] = original
+        else:
+            s.objects[obj_id] = WorldObject(
+                obj_id=obj_id,
+                obj_type=ObjectType.TOKEN,
+                x=s.agent_x,
+                y=s.agent_y,
+                room_id=s.agent_room,
+            )
         return ActionResult(True, f"Dropped {obj_id} at ({s.agent_x},{s.agent_y}) in {s.rooms[s.agent_room].name}.")
 
     def _use(self, obj_id: str, target_id: str) -> ActionResult:

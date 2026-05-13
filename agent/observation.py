@@ -47,8 +47,9 @@ def render_observation(engine: "WorldEngine", system_messages: list[str] | None 
     lines.append("[INVENTORY]")
     if s.inventory:
         for item_id in s.inventory:
-            weight = "?"
-            fragile_tag = ""
+            obj = s.carried.get(item_id)
+            weight = obj.weight if obj else "?"
+            fragile_tag = " [FRAGILE]" if obj and obj.fragile else ""
             lines.append(f"  - {item_id} (weight: {weight}){fragile_tag}")
     else:
         lines.append("  (empty)")

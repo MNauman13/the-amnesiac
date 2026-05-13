@@ -129,11 +129,13 @@ python -m pytest tests/ -v               # Run all 65 unit tests
 | `reach_with_item_timed` | `item_id`, `target_room`, `max_steps` | Deliver within step limit |
 
 ## What Remains (Phase 6 — Polish)
-- README.md with setup/demo instructions
 - Web visualiser (optional — React/Next.js replay viewer)
-- Comparative mode (memory-enabled vs memory-wiped)
+- Comparative mode (memory-enabled vs memory-wiped agent)
 - T6 Labyrinth task (room shuffle, expert difficulty)
-- Benchmark runner (3 seeds × 5 tasks)
+
+## What's Done Beyond MVP
+- benchmark.py — 3 seeds × N tasks runner with tabular report (`python benchmark.py --tasks t1 t2 --seeds 42 7 137`)
+- DROP bug fixed: `WorldState.carried` dict preserves original object metadata through pickup/drop cycle
 
 ## Known Considerations
 - `DROP` in engine.py creates a WorldObject with type KEY as placeholder — the original object type is lost on drop. For MVP this is acceptable since the only items that matter are keys and fragments; a full implementation would preserve type.
@@ -141,5 +143,5 @@ python -m pytest tests/ -v               # Run all 65 unit tests
 - The observation renderer shows "3-cell radius" objects in a separate [NEARBY OBJECTS] section, not inline in compass directions for objects beyond 1 cell — minor deviation from PRD format but functionally equivalent.
 
 ## GitHub
-Repository: https://github.com/mnaumansiddiqui06/the-amnesiac (to be created)
-Commit strategy: one commit per completed phase
+Repository: https://github.com/MNauman13/the-amnesiac
+Commit strategy: one commit per completed phase / bugfix
