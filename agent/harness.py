@@ -76,16 +76,31 @@ class AgentHarness:
         scroll_before = self._memory.read()
         user_message = self._build_user_message(obs, scroll_before)
 
-        llm_resp: LLMResponse = self._llm.call(SYSTEM_PROMPT, user_message)
-        parse_result: ParseResult = parse_response(llm_resp.content)
+        from agent.llm import TimeoutError as LLMTimeout
+        timed_out = False
+        try:
+            llm_resp: LLMResponse = self._llm.call(SYSTEM_PROMPT, user_message)
+        except LLMTimeout as e:
+            timed_out = True
+            llm_resp = LLMResponse(content="", input_tokens=0, output_tokens=0,
+                                   model=self._llm.model, latency_ms=0.0)
+            self._pending_system.append(f"TIMEOUT: LLM exceeded {self._llm.timeout_sec}s — WAIT substituted.")
+            if self._verbose:
+                print(f"  [timeout] {e}")
+
+        if timed_out:
+            parse_result = ParseResult(None, None, "LLM timeout")
+        else:
+            parse_result = parse_response(llm_resp.content)
 
         if not parse_result.ok:
             self._consecutive_parse_errors += 1
             action = Action("WAIT", [], "WAIT")
-            err = parse_result.parse_error or "Parse error"
-            self._pending_system.append(f"PARSE_ERROR: {err} — WAIT substituted.")
-            if self._verbose:
-                print(f"  [parse error] {err}")
+            if not timed_out:
+                err = parse_result.parse_error or "Parse error"
+                self._pending_system.append(f"PARSE_ERROR: {err} — WAIT substituted.")
+                if self._verbose:
+                    print(f"  [parse error] {err}")
         else:
             self._consecutive_parse_errors = 0
             action = parse_result.action

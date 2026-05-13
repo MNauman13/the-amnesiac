@@ -1,0 +1,160 @@
+{
+  "id": "T6",
+  "name": "The Labyrinth",
+  "description": "Fragment Assembly in Room Shuffle mode — corridors reroute every 10 steps",
+  "difficulty": "expert",
+  "max_steps": 300,
+  "optimal_steps": 80,
+  "rooms": [
+    {
+      "id": "nexus",
+      "name": "Nexus",
+      "width": 7,
+      "height": 7,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["floor","floor","floor","floor","floor","floor","floor"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","floor","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "archive",
+      "name": "Archive",
+      "width": 8,
+      "height": 6,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "vault",
+      "name": "Vault",
+      "width": 6,
+      "height": 5,
+      "grid": [
+        ["wall","wall","floor","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "atrium",
+      "name": "Atrium",
+      "width": 7,
+      "height": 5,
+      "grid": [
+        ["wall","wall","wall","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","floor","wall","wall","wall"]
+      ]
+    }
+  ],
+  "doors": [
+    {
+      "id": "DOOR_N_A",
+      "room_a": "nexus",
+      "room_b": "archive",
+      "pos_a": [3, 0],
+      "pos_b": [3, 0],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_N_V",
+      "room_a": "nexus",
+      "room_b": "vault",
+      "pos_a": [6, 3],
+      "pos_b": [0, 2],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_N_T",
+      "room_a": "nexus",
+      "room_b": "atrium",
+      "pos_a": [3, 6],
+      "pos_b": [3, 4],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_A_T",
+      "room_a": "archive",
+      "room_b": "atrium",
+      "pos_a": [0, 3],
+      "pos_b": [0, 2],
+      "locked": false,
+      "required_key_type": null
+    }
+  ],
+  "objects": [
+    {
+      "id": "FRAGMENT_A",
+      "type": "fragment",
+      "x": 5,
+      "y": 3,
+      "room": "archive",
+      "weight": 1
+    },
+    {
+      "id": "FRAGMENT_B",
+      "type": "fragment",
+      "x": 2,
+      "y": 2,
+      "room": "vault",
+      "weight": 1
+    },
+    {
+      "id": "FRAGMENT_C",
+      "type": "fragment",
+      "x": 4,
+      "y": 2,
+      "room": "atrium",
+      "weight": 1
+    },
+    {
+      "id": "FRAGMENT_D",
+      "type": "fragment",
+      "x": 2,
+      "y": 2,
+      "room": "nexus",
+      "weight": 1
+    }
+  ],
+  "agent": {
+    "start_room": "nexus",
+    "start_x": 3,
+    "start_y": 3,
+    "facing": "NORTH"
+  },
+  "goal": {
+    "type": "collect_fragments_at_zone",
+    "fragments": ["FRAGMENT_A", "FRAGMENT_B", "FRAGMENT_C", "FRAGMENT_D"],
+    "zone_room": "nexus",
+    "zone_pos": [3, 3],
+    "description": "Collect all 4 fragments (A,B,C,D) and return to Nexus (3,3) — corridors reroute every 10 steps!"
+  },
+  "dynamics": {
+    "object_drift": {"enabled": false},
+    "door_relock": {"enabled": false},
+    "room_shuffle": {
+      "enabled": true,
+      "interval": 10,
+      "door_ids": ["DOOR_N_A", "DOOR_N_V", "DOOR_N_T", "DOOR_A_T"]
+    },
+    "adversarial": {"enabled": false}
+  }
+}

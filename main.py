@@ -19,6 +19,7 @@ def load_task(task_id: str) -> dict:
         "t3": "t3_moving_target.json",
         "t4": "t4_cartographer.json",
         "t5": "t5_relay_race.json",
+        "t6": "t6_labyrinth.json",
     }
     key = task_id.lower()
     if key not in mapping:
@@ -40,6 +41,12 @@ def run(args: argparse.Namespace) -> None:
 
     config = load_task(args.task)
     task_id = config["id"].lower()
+
+    if getattr(args, "adversarial", False):
+        config.setdefault("dynamics", {})["adversarial"] = {
+            "enabled": True, "interval": 3, "false_event_rate": 0.6
+        }
+        task_id += "_adversarial"
 
     engine = WorldEngine(config, seed=args.seed)
     memory = MemoryScroll()
@@ -86,7 +93,11 @@ def main() -> None:
     )
     parser.add_argument(
         "task",
-        help="Task ID to run (t1, t2, t3, t4, t5)",
+        help="Task ID to run (t1–t6)",
+    )
+    parser.add_argument(
+        "--adversarial", action="store_true",
+        help="Enable adversarial mode: inject false events to test memory robustness",
     )
     parser.add_argument(
         "--provider",

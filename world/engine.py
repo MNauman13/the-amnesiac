@@ -124,6 +124,10 @@ class WorldEngine:
     def goal_description(self) -> str:
         return self._goal.description
 
+    def goal_status_lines(self) -> list[str]:
+        from world.tasks import goal_status_lines as _gsl
+        return _gsl(self.state, self._goal)
+
     def optimal_steps(self) -> int:
         return self._optimal_steps
 

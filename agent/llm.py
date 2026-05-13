@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import os
 import time
+import threading
 from dataclasses import dataclass
-from typing import Optional
+from typing import Callable
 
 
 @dataclass
@@ -15,6 +16,31 @@ class LLMResponse:
     latency_ms: float
 
 
+class TimeoutError(Exception):
+    pass
+
+
+def _call_with_timeout(fn: Callable, timeout_sec: float):
+    result: list = [None]
+    error: list = [None]
+
+    def target():
+        try:
+            result[0] = fn()
+        except Exception as e:
+            error[0] = e
+
+    thread = threading.Thread(target=target, daemon=True)
+    thread.start()
+    thread.join(timeout_sec)
+
+    if thread.is_alive():
+        raise TimeoutError(f"LLM call timed out after {timeout_sec}s")
+    if error[0] is not None:
+        raise error[0]
+    return result[0]
+
+
 class LLMClient:
     def __init__(
         self,
@@ -22,11 +48,13 @@ class LLMClient:
         model: str | None = None,
         temperature: float = 0.3,
         max_tokens: int = 800,
+        timeout_sec: float = 30.0,
         api_key: str | None = None,
     ) -> None:
         self.provider = provider.lower()
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.timeout_sec = timeout_sec
 
         if self.provider == "anthropic":
             self.model = model or "claude-sonnet-4-6"
@@ -56,8 +84,11 @@ class LLMClient:
     def call(self, system_prompt: str, user_message: str) -> LLMResponse:
         start = time.monotonic()
         if self.provider == "anthropic":
-            return self._call_anthropic(system_prompt, user_message, start)
-        return self._call_openai(system_prompt, user_message, start)
+            fn = lambda: self._call_anthropic(system_prompt, user_message, start)
+        else:
+            fn = lambda: self._call_openai(system_prompt, user_message, start)
+
+        return _call_with_timeout(fn, self.timeout_sec)
 
     def _call_anthropic(self, system_prompt: str, user_message: str, start: float) -> LLMResponse:
         import anthropic
@@ -106,7 +137,7 @@ class LLMClient:
 
 
 SYSTEM_PROMPT = """You are an agent operating in a virtual world.
-You have NO memory of previous steps. Your only memory is the SCROLL shown in the observation.
+You have NO memory of previous steps. Your only memory is the SCROLL shown before the observation.
 
 Each step you MUST output exactly two things in this exact format:
 
@@ -116,18 +147,40 @@ MEMORY_UPDATE:
 <your updated scroll — max 2048 bytes>
 
 Available actions:
-  MOVE NORTH/SOUTH/EAST/WEST   — move one cell
+  MOVE NORTH/SOUTH/EAST/WEST   — move one cell in a cardinal direction
   TURN <direction>             — change facing without moving
-  PICKUP <object_id>           — pick up nearby object
+  PICKUP <object_id>           — pick up object within 3 cells
   DROP <object_id>             — drop item in current cell
-  USE <object_id> ON <target>  — use item on target (e.g. key on door)
+  USE <object_id> ON <target>  — use item on target (e.g. USE KEY_BLUE ON DOOR_1)
   INSPECT <object_id>          — examine object in range
-  WAIT                         — skip turn
+  WAIT                         — skip turn (world dynamics still tick)
 
-Rules:
-- Your scroll is overwritten every step. There is no undo. Curate wisely.
-- Think: what does your future self NEED to know? What can be discarded?
-- If you skip MEMORY_UPDATE you will be penalised.
-- Doors require their matching key to unlock (USE KEY ON DOOR).
-- You can only pick up objects within 3 cells of your position.
-- Output the ACTION line first, then MEMORY_UPDATE. Nothing else."""
+Memory rules:
+  - Your scroll is COMPLETELY OVERWRITTEN every step. No undo.
+  - Think: what does your future amnesiac self NEED to know?
+  - Drop outdated facts. Keep landmarks, goals, dynamic warnings.
+  - Doors need their matching key: USE KEY_ID ON DOOR_ID when adjacent.
+  - You can only PICKUP objects within 3 cells (Manhattan distance).
+
+--- EXAMPLE (Task: find key, unlock door) ---
+
+Step 1 response:
+ACTION: MOVE EAST
+
+MEMORY_UPDATE:
+[GOAL] Find KEY_BLUE → use on DOOR_1 → enter Hallway A
+[MAP] Library: starting room. Unexplored. Sweeping E then N.
+[STATE] No key yet. Door location unknown.
+
+Step 8 response (after spotting KEY_BLUE):
+ACTION: PICKUP KEY_BLUE
+
+MEMORY_UPDATE:
+[GOAL] Have KEY_BLUE ✓ → find DOOR_1 → unlock → enter Hallway A
+[MAP] Library(1,1)=start. Corridor SOUTH(3,5)→DOOR_1→HallwayA
+[STATE] KEY_BLUE in hand. DOOR_1 re-locks every ~8 steps — act fast.
+[STEP] 8 — picked up key
+
+--- END EXAMPLE ---
+
+Output the ACTION line first, then MEMORY_UPDATE. Nothing else."""

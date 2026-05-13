@@ -240,6 +240,7 @@ class TestTaskConfigs:
         "t3_moving_target.json",
         "t4_cartographer.json",
         "t5_relay_race.json",
+        "t6_labyrinth.json",
     ])
     def test_task_config_loads(self, filename):
         tasks_dir = os.path.join(os.path.dirname(__file__), "..", "tasks")

@@ -8,13 +8,6 @@ if TYPE_CHECKING:
     from world.engine import WorldEngine
 
 
-_OPPOSITE = {
-    "NORTH": "SOUTH", "SOUTH": "NORTH",
-    "EAST": "WEST", "WEST": "EAST",
-    "NE": "SW", "SW": "NE", "NW": "SE", "SE": "NW",
-}
-
-
 def render_observation(engine: "WorldEngine", system_messages: list[str] | None = None) -> str:
     s = engine.get_state()
     events = engine.get_events()
@@ -30,18 +23,9 @@ def render_observation(engine: "WorldEngine", system_messages: list[str] | None 
 
     lines.append("[SURROUNDINGS — 3-cell radius]")
     for label in COMPASS_8:
-        dx, dy = DIR_DELTA[label]
-        nx, ny = s.agent_x + dx, s.agent_y + dy
-        cell_desc = _describe_cell(engine, s.agent_room, nx, ny, s.agent_x, s.agent_y)
+        cell_desc = _scan_direction(engine, s.agent_room, s.agent_x, s.agent_y, label)
         lines.append(f"{label}: {cell_desc}")
     lines.append(f"CELL: {_current_cell_desc(engine, s.agent_room, s.agent_x, s.agent_y)}")
-
-    nearby = _nearby_objects(engine, s.agent_room, s.agent_x, s.agent_y, radius=3)
-    if nearby:
-        lines.append("")
-        lines.append("[NEARBY OBJECTS]")
-        for desc in nearby:
-            lines.append(f"  {desc}")
 
     lines.append("")
     lines.append("[INVENTORY]")
@@ -49,7 +33,7 @@ def render_observation(engine: "WorldEngine", system_messages: list[str] | None 
         for item_id in s.inventory:
             obj = s.carried.get(item_id)
             weight = obj.weight if obj else "?"
-            fragile_tag = " [FRAGILE]" if obj and obj.fragile else ""
+            fragile_tag = " [FRAGILE — do not drop]" if obj and obj.fragile else ""
             lines.append(f"  - {item_id} (weight: {weight}){fragile_tag}")
     else:
         lines.append("  (empty)")
@@ -76,8 +60,8 @@ def render_observation(engine: "WorldEngine", system_messages: list[str] | None 
 
     lines.append("")
     lines.append("[GOAL REMINDER]")
-    goal_text = engine.goal_description()
-    lines.append(f"  {goal_text}")
+    for goal_line in engine.goal_status_lines():
+        lines.append(f"  {goal_line}")
 
     lines.append("")
     lines.append("=== END OBSERVATION ===")
@@ -85,26 +69,33 @@ def render_observation(engine: "WorldEngine", system_messages: list[str] | None 
     return "\n".join(lines)
 
 
-def _describe_cell(engine: "WorldEngine", room_id: str, x: int, y: int, from_x: int, from_y: int) -> str:
+def _scan_direction(engine: "WorldEngine", room_id: str, ax: int, ay: int, label: str) -> str:
+    """Scan up to 3 cells in direction label; return description of first notable thing."""
+    dx, dy = DIR_DELTA[label]
     s = engine.get_state()
     room = s.rooms[room_id]
 
-    if not room.in_bounds(x, y):
-        return "out of bounds"
+    for dist in range(1, 4):
+        nx, ny = ax + dx * dist, ay + dy * dist
 
-    door = _door_at_pos(engine, room_id, x, y)
-    if door is not None:
-        other = door.other_room(room_id)
-        other_name = s.rooms[other].name
-        state_tag = "LOCKED" if door.locked else "open"
-        return f"door → {other_name} [{state_tag}] ({door.door_id})"
+        if not room.in_bounds(nx, ny):
+            return "wall" if dist == 1 else "open space"
 
-    if room.is_wall(x, y):
-        return "wall"
+        door = _door_at_pos(engine, room_id, nx, ny)
+        if door is not None:
+            other = s.rooms[door.other_room(room_id)].name
+            state_tag = "LOCKED" if door.locked else "open"
+            dist_tag = f" (dist {dist})" if dist > 1 else ""
+            return f"corridor → {other} [{state_tag}] ({door.door_id}){dist_tag}"
 
-    obj = _object_at_pos(engine, room_id, x, y)
-    if obj is not None:
-        return f"{obj.obj_id} at ({x},{y})"
+        if room.is_wall(nx, ny):
+            dist_tag = f" (dist {dist})" if dist > 1 else ""
+            return f"wall{dist_tag}"
+
+        obj = _object_at_pos(engine, room_id, nx, ny)
+        if obj is not None:
+            dist_tag = f" (dist {dist})" if dist > 1 else ""
+            return f"{obj.obj_id} at ({nx},{ny}){dist_tag}"
 
     return "floor"
 
@@ -113,19 +104,7 @@ def _current_cell_desc(engine: "WorldEngine", room_id: str, x: int, y: int) -> s
     door = _door_at_pos(engine, room_id, x, y)
     if door is not None:
         return "door threshold"
-    return "floor"
-
-
-def _nearby_objects(engine: "WorldEngine", room_id: str, ax: int, ay: int, radius: int) -> list[str]:
-    s = engine.get_state()
-    result = []
-    for obj in s.objects.values():
-        if obj.room_id != room_id:
-            continue
-        dist = max(abs(obj.x - ax), abs(obj.y - ay))
-        if 1 < dist <= radius:
-            result.append(f"{obj.obj_id} at ({obj.x},{obj.y})")
-    return result
+    return "floor (standing on)"
 
 
 def _door_at_pos(engine: "WorldEngine", room_id: str, x: int, y: int):

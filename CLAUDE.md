@@ -128,14 +128,31 @@ python -m pytest tests/ -v               # Run all 65 unit tests
 | `visit_all_rooms` | `room_ids[]` | Visit every listed room |
 | `reach_with_item_timed` | `item_id`, `target_room`, `max_steps` | Deliver within step limit |
 
-## What Remains (Phase 6 — Polish)
-- Web visualiser (optional — React/Next.js replay viewer)
-- Comparative mode (memory-enabled vs memory-wiped agent)
-- T6 Labyrinth task (room shuffle, expert difficulty)
+## What's Done (Complete)
+- All 6 task configs: T1–T6 (T6 is expert Labyrinth with room shuffle)
+- Room shuffle dynamics: swaps door destinations every K steps
+- Adversarial world mode: injects [UNVERIFIED] false events (`--adversarial` flag)
+- Observation surroundings: 3-cell radius scan in each of 8 directions (inline, no separate section)
+- Dynamic goal reminder: shows real-time fragment counts, unvisited rooms, step countdowns
+- LLM timeout: 30s hard limit, WAIT substituted on timeout
+- Few-shot example in SYSTEM_PROMPT for first-step guidance
+- Comparative mode: `python compare.py t1` runs memory-enabled vs memory-wiped side-by-side
+- `NullMemoryScroll`: always-empty scroll for comparative runs
+- benchmark.py: multi-seed, multi-task sweeps
+- Web visualiser: Next.js app in `viz/` with step-by-step replay, scroll/observation side-by-side
+- DROP bug fixed: `WorldState.carried` preserves original object metadata
+- 95 unit tests (all passing)
 
-## What's Done Beyond MVP
-- benchmark.py — 3 seeds × N tasks runner with tabular report (`python benchmark.py --tasks t1 t2 --seeds 42 7 137`)
-- DROP bug fixed: `WorldState.carried` dict preserves original object metadata through pickup/drop cycle
+## Running Everything
+```bash
+python main.py t1                          # single task run
+python main.py t6 --adversarial            # T6 Labyrinth with false events
+python compare.py t2                       # memory-enabled vs memory-wiped comparison
+python benchmark.py --tasks t1 t2 t3       # multi-seed benchmark
+python -m pytest tests/ -v                 # 95 unit tests
+
+cd viz && npm run dev                      # web visualiser at http://localhost:3000
+```
 
 ## Known Considerations
 - `DROP` in engine.py creates a WorldObject with type KEY as placeholder — the original object type is lost on drop. For MVP this is acceptable since the only items that matter are keys and fragments; a full implementation would preserve type.
