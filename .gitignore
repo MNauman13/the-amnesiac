@@ -1,4 +1,6 @@
 .env
+viz/node_modules/
+viz/.next/
 __pycache__/
 *.pyc
 *.pyo
