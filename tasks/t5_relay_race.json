@@ -1,0 +1,119 @@
+{
+  "id": "T5",
+  "name": "Relay Race",
+  "description": "Carry a fragile relic through 4 rooms without dropping it, within 50 steps",
+  "difficulty": "hard",
+  "max_steps": 50,
+  "optimal_steps": 20,
+  "rooms": [
+    {
+      "id": "start_room",
+      "name": "Start Chamber",
+      "width": 6,
+      "height": 5,
+      "grid": [
+        ["wall","wall","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","floor","wall","wall"]
+      ]
+    },
+    {
+      "id": "passage_a",
+      "name": "Passage A",
+      "width": 6,
+      "height": 4,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","floor","wall","wall"]
+      ]
+    },
+    {
+      "id": "passage_b",
+      "name": "Passage B",
+      "width": 6,
+      "height": 4,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","floor","wall","wall"]
+      ]
+    },
+    {
+      "id": "vault",
+      "name": "Vault",
+      "width": 6,
+      "height": 5,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall"]
+      ]
+    }
+  ],
+  "doors": [
+    {
+      "id": "DOOR_S_A",
+      "room_a": "start_room",
+      "room_b": "passage_a",
+      "pos_a": [3, 4],
+      "pos_b": [3, 0],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_A_B",
+      "room_a": "passage_a",
+      "room_b": "passage_b",
+      "pos_a": [3, 3],
+      "pos_b": [3, 0],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_B_V",
+      "room_a": "passage_b",
+      "room_b": "vault",
+      "pos_a": [3, 3],
+      "pos_b": [3, 0],
+      "locked": false,
+      "required_key_type": null
+    }
+  ],
+  "objects": [
+    {
+      "id": "RELIC",
+      "type": "relic",
+      "x": 2,
+      "y": 2,
+      "room": "start_room",
+      "weight": 2,
+      "fragile": true,
+      "properties": {"note": "Fragile — do not drop"}
+    }
+  ],
+  "agent": {
+    "start_room": "start_room",
+    "start_x": 1,
+    "start_y": 1,
+    "facing": "SOUTH"
+  },
+  "goal": {
+    "type": "reach_with_item_timed",
+    "item_id": "RELIC",
+    "target_room": "vault",
+    "max_steps": 50,
+    "description": "Carry RELIC (FRAGILE — never drop it) to the Vault within 50 steps"
+  },
+  "dynamics": {
+    "object_drift": {"enabled": false},
+    "door_relock": {"enabled": false},
+    "room_shuffle": {"enabled": false}
+  }
+}

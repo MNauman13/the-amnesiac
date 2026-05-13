@@ -1,0 +1,136 @@
+{
+  "id": "T4",
+  "name": "Cartographer",
+  "description": "Build a complete internal map by visiting all 5 rooms",
+  "difficulty": "hard",
+  "max_steps": 200,
+  "optimal_steps": 35,
+  "rooms": [
+    {
+      "id": "hub",
+      "name": "Central Hub",
+      "width": 7,
+      "height": 7,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["floor","floor","floor","floor","floor","floor","floor"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","floor","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "north_wing",
+      "name": "North Wing",
+      "width": 7,
+      "height": 5,
+      "grid": [
+        ["wall","wall","wall","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","floor","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "south_wing",
+      "name": "South Wing",
+      "width": 7,
+      "height": 5,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "east_wing",
+      "name": "East Wing",
+      "width": 5,
+      "height": 7,
+      "grid": [
+        ["wall","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","wall"],
+        ["floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "west_wing",
+      "name": "West Wing",
+      "width": 5,
+      "height": 7,
+      "grid": [
+        ["wall","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor"],
+        ["wall","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall"]
+      ]
+    }
+  ],
+  "doors": [
+    {
+      "id": "DOOR_H_N",
+      "room_a": "hub",
+      "room_b": "north_wing",
+      "pos_a": [3, 0],
+      "pos_b": [3, 4],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_H_S",
+      "room_a": "hub",
+      "room_b": "south_wing",
+      "pos_a": [3, 6],
+      "pos_b": [3, 0],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_H_E",
+      "room_a": "hub",
+      "room_b": "east_wing",
+      "pos_a": [6, 3],
+      "pos_b": [0, 3],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_H_W",
+      "room_a": "hub",
+      "room_b": "west_wing",
+      "pos_a": [0, 3],
+      "pos_b": [4, 3],
+      "locked": false,
+      "required_key_type": null
+    }
+  ],
+  "objects": [],
+  "agent": {
+    "start_room": "hub",
+    "start_x": 3,
+    "start_y": 3,
+    "facing": "NORTH"
+  },
+  "goal": {
+    "type": "visit_all_rooms",
+    "room_ids": ["hub", "north_wing", "south_wing", "east_wing", "west_wing"],
+    "description": "Visit all 5 rooms: Central Hub, North Wing, South Wing, East Wing, West Wing"
+  },
+  "dynamics": {
+    "object_drift": {"enabled": false},
+    "door_relock": {"enabled": false},
+    "room_shuffle": {"enabled": false}
+  }
+}

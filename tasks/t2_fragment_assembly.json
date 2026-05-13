@@ -1,0 +1,124 @@
+{
+  "id": "T2",
+  "name": "Fragment Assembly",
+  "description": "Collect 4 fragments scattered across 3 rooms, bring to assembly zone",
+  "difficulty": "medium",
+  "max_steps": 200,
+  "optimal_steps": 40,
+  "rooms": [
+    {
+      "id": "foyer",
+      "name": "Foyer",
+      "width": 7,
+      "height": 7,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","floor","wall","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "library",
+      "name": "Library",
+      "width": 8,
+      "height": 6,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "storage",
+      "name": "Storage",
+      "width": 6,
+      "height": 5,
+      "grid": [
+        ["wall","wall","floor","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall"]
+      ]
+    }
+  ],
+  "doors": [
+    {
+      "id": "DOOR_F_L",
+      "room_a": "foyer",
+      "room_b": "library",
+      "pos_a": [3, 0],
+      "pos_b": [3, 0],
+      "locked": false,
+      "required_key_type": null
+    },
+    {
+      "id": "DOOR_F_S",
+      "room_a": "foyer",
+      "room_b": "storage",
+      "pos_a": [2, 6],
+      "pos_b": [2, 0],
+      "locked": false,
+      "required_key_type": null
+    }
+  ],
+  "objects": [
+    {
+      "id": "FRAGMENT_A",
+      "type": "fragment",
+      "x": 5,
+      "y": 3,
+      "room": "library",
+      "weight": 1
+    },
+    {
+      "id": "FRAGMENT_B",
+      "type": "fragment",
+      "x": 2,
+      "y": 2,
+      "room": "storage",
+      "weight": 1
+    },
+    {
+      "id": "FRAGMENT_C",
+      "type": "fragment",
+      "x": 4,
+      "y": 4,
+      "room": "foyer",
+      "weight": 1
+    },
+    {
+      "id": "FRAGMENT_D",
+      "type": "fragment",
+      "x": 1,
+      "y": 2,
+      "room": "library",
+      "weight": 1
+    }
+  ],
+  "agent": {
+    "start_room": "foyer",
+    "start_x": 3,
+    "start_y": 3,
+    "facing": "NORTH"
+  },
+  "goal": {
+    "type": "collect_fragments_at_zone",
+    "fragments": ["FRAGMENT_A", "FRAGMENT_B", "FRAGMENT_C", "FRAGMENT_D"],
+    "zone_room": "foyer",
+    "zone_pos": [2, 2],
+    "description": "Collect all 4 fragments (A, B, C, D) and return to Assembly Zone in Foyer at (2,2)"
+  },
+  "dynamics": {
+    "object_drift": {"enabled": false},
+    "door_relock": {"enabled": false},
+    "room_shuffle": {"enabled": false}
+  }
+}

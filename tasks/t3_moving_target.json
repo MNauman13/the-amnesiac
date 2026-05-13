@@ -1,0 +1,77 @@
+{
+  "id": "T3",
+  "name": "Moving Target",
+  "description": "Track and pick up an object that drifts every 3 steps",
+  "difficulty": "medium",
+  "max_steps": 100,
+  "optimal_steps": 12,
+  "rooms": [
+    {
+      "id": "arena",
+      "name": "Arena",
+      "width": 9,
+      "height": 7,
+      "grid": [
+        ["wall","wall","wall","wall","wall","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "corridor",
+      "name": "Corridor",
+      "width": 9,
+      "height": 3,
+      "grid": [
+        ["wall","wall","wall","wall","floor","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall","wall","wall","wall"]
+      ]
+    }
+  ],
+  "doors": [
+    {
+      "id": "DOOR_A_C",
+      "room_a": "arena",
+      "room_b": "corridor",
+      "pos_a": [4, 0],
+      "pos_b": [4, 0],
+      "locked": false,
+      "required_key_type": null
+    }
+  ],
+  "objects": [
+    {
+      "id": "TOKEN_1",
+      "type": "token",
+      "x": 6,
+      "y": 3,
+      "room": "arena",
+      "weight": 1
+    }
+  ],
+  "agent": {
+    "start_room": "arena",
+    "start_x": 1,
+    "start_y": 1,
+    "facing": "EAST"
+  },
+  "goal": {
+    "type": "pickup_item",
+    "item_id": "TOKEN_1",
+    "description": "Pick up TOKEN_1 — it drifts every 3 steps, so track its movement"
+  },
+  "dynamics": {
+    "object_drift": {
+      "enabled": true,
+      "interval": 3,
+      "object_ids": ["TOKEN_1"]
+    },
+    "door_relock": {"enabled": false},
+    "room_shuffle": {"enabled": false}
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "id": "T1",
+  "name": "Key & Lock",
+  "description": "Find a key, navigate to a locked door, unlock and pass through",
+  "difficulty": "easy",
+  "max_steps": 100,
+  "optimal_steps": 14,
+  "rooms": [
+    {
+      "id": "library",
+      "name": "Library",
+      "width": 8,
+      "height": 6,
+      "grid": [
+        ["wall","wall","wall","wall","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","floor","wall","wall","wall","wall"]
+      ]
+    },
+    {
+      "id": "hallway_a",
+      "name": "Hallway A",
+      "width": 8,
+      "height": 5,
+      "grid": [
+        ["wall","wall","wall","floor","wall","wall","wall","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","floor","floor","floor","floor","floor","floor","wall"],
+        ["wall","wall","wall","wall","wall","wall","wall","wall"]
+      ]
+    }
+  ],
+  "doors": [
+    {
+      "id": "DOOR_1",
+      "room_a": "library",
+      "room_b": "hallway_a",
+      "pos_a": [3, 5],
+      "pos_b": [3, 0],
+      "locked": true,
+      "required_key_type": "KEY_BLUE"
+    }
+  ],
+  "objects": [
+    {
+      "id": "KEY_BLUE",
+      "type": "key",
+      "x": 5,
+      "y": 3,
+      "room": "library",
+      "weight": 0,
+      "properties": {"color": "blue", "unlocks": "DOOR_1"}
+    }
+  ],
+  "agent": {
+    "start_room": "library",
+    "start_x": 1,
+    "start_y": 1,
+    "facing": "EAST"
+  },
+  "goal": {
+    "type": "reach_room",
+    "target_room": "hallway_a",
+    "description": "Find KEY_BLUE and use it to unlock DOOR_1, then enter Hallway A"
+  },
+  "dynamics": {
+    "object_drift": {"enabled": false},
+    "door_relock": {
+      "enabled": true,
+      "interval": 8,
+      "door_ids": ["DOOR_1"]
+    },
+    "room_shuffle": {"enabled": false}
+  }
+}
