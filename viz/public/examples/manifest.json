@@ -1,0 +1,22 @@
+[
+  {
+    "id": "t1",
+    "label": "T1 — Key & Lock",
+    "difficulty": "Easy",
+    "difficultyColor": "#22c55e",
+    "description": "Agent finds KEY_BLUE, unlocks DOOR_1, and reaches Hallway A. The door re-locks every 8 steps.",
+    "file": "run_t1.jsonl",
+    "score": 0.941,
+    "steps": 10
+  },
+  {
+    "id": "t2",
+    "label": "T2 — Fragment Assembly",
+    "difficulty": "Medium",
+    "difficultyColor": "#eab308",
+    "description": "Agent collects 4 fragments across 3 rooms and returns to the assembly zone.",
+    "file": "run_t2.jsonl",
+    "score": 0.911,
+    "steps": 48
+  }
+]
