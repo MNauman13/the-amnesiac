@@ -28,6 +28,7 @@ class StepResult:
     tokens_in: int
     tokens_out: int
     latency_ms: float
+    world_state: dict | None = None
     system_messages: list[str] = field(default_factory=list)
 
 
@@ -72,6 +73,7 @@ class AgentHarness:
 
         obs = render_observation(self._engine, self._pending_system)
         self._pending_system = []
+        world_snap = self._snapshot_world()
 
         scroll_before = self._memory.read()
         user_message = self._build_user_message(obs, scroll_before)
@@ -139,6 +141,7 @@ class AgentHarness:
             tokens_in=llm_resp.input_tokens,
             tokens_out=llm_resp.output_tokens,
             latency_ms=llm_resp.latency_ms,
+            world_state=world_snap,
             system_messages=list(self._pending_system),
         )
 
@@ -201,6 +204,55 @@ class AgentHarness:
             f"tok={r.tokens_in}+{r.tokens_out}"
         )
 
+    def _snapshot_world(self) -> dict:
+        s = self._engine.get_state()
+        room = s.rooms[s.agent_room]
+
+        doors_here = []
+        for door in s.doors.values():
+            pos = door.position_in(s.agent_room)
+            if pos is not None:
+                other_id = door.other_room(s.agent_room)
+                other_name = s.rooms[other_id].name if other_id in s.rooms else other_id
+                doors_here.append({
+                    "id": door.door_id,
+                    "x": pos[0],
+                    "y": pos[1],
+                    "locked": door.locked,
+                    "to_room_name": other_name,
+                })
+
+        objects_here = []
+        for obj in s.objects.values():
+            if obj.room_id == s.agent_room:
+                objects_here.append({
+                    "id": obj.obj_id,
+                    "type": obj.obj_type.value if hasattr(obj.obj_type, "value") else str(obj.obj_type),
+                    "x": obj.x,
+                    "y": obj.y,
+                })
+
+        snap = {
+            "room_id": s.agent_room,
+            "room_name": room.name,
+            "width": room.width,
+            "height": room.height,
+            "grid": room.grid,
+            "agent": {"x": s.agent_x, "y": s.agent_y, "facing": s.agent_facing},
+            "objects": objects_here,
+            "doors": doors_here,
+            "inventory": list(s.inventory),
+        }
+
+        goal = self._engine._goal
+        if goal.goal_type == "collect_fragments_at_zone":
+            zone_room = goal.params.get("zone_room")
+            zone_pos = goal.params.get("zone_pos")
+            if zone_room == s.agent_room and zone_pos:
+                snap["zone"] = {"x": zone_pos[0], "y": zone_pos[1]}
+
+        return snap
+
     def _log_step(self, r: StepResult) -> None:
         if not self._log_dir:
             return
@@ -219,6 +271,7 @@ class AgentHarness:
             "goal_complete": r.goal_complete,
             "tokens": {"input": r.tokens_in, "output": r.tokens_out},
             "latency_ms": round(r.latency_ms, 1),
+            "world_state": r.world_state,
         }
         with open(log_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(record) + "\n")
