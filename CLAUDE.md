@@ -3,7 +3,7 @@
 ## Project Overview
 An LLM agent harness where the agent forgets everything between steps and must design/maintain its own external memory to survive long-horizon tasks in a dynamic 2D grid world.
 
-**Humanoid Internship Challenge Submission — Summer 2025**
+**Humanoid Internship Challenge Submission — Summer 2026**
 
 ## Current Status
 - **Phase**: MVP complete (Phases 1–5 of 6)

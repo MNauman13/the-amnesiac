@@ -7,7 +7,7 @@
 ![Tasks](https://img.shields.io/badge/tasks-T1%20through%20T6-orange?style=flat-square)
 ![Providers](https://img.shields.io/badge/LLM-Claude%20%7C%20GPT--4o-purple?style=flat-square)
 
-**Humanoid Robotics Internship Challenge · Summer 2025**
+**Humanoid Robotics Internship Challenge · Summer 2026**
 
 ---
 
