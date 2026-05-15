@@ -178,8 +178,7 @@ def main() -> None:
         "--seeds", nargs="+", type=int, default=DEFAULT_SEEDS,
         help="RNG seeds (default: 42 7 137)"
     )
-    parser.add_argument("--provider", default="anthropic", choices=["anthropic", "openai"])
-    parser.add_argument("--model", default=None)
+    parser.add_argument("--model", default=None, help="Model override (default: claude-sonnet-4-6)")
     parser.add_argument("--temperature", type=float, default=0.3)
     parser.add_argument("--api-key", default=None, dest="api_key")
     parser.add_argument("--threshold", type=float, default=0.75)
@@ -191,7 +190,6 @@ def main() -> None:
     load_dotenv()
 
     llm = LLMClient(
-        provider=args.provider,
         model=args.model,
         temperature=args.temperature,
         api_key=args.api_key,

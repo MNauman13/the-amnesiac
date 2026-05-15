@@ -44,50 +44,28 @@ def _call_with_timeout(fn: Callable, timeout_sec: float):
 class LLMClient:
     def __init__(
         self,
-        provider: str = "anthropic",
         model: str | None = None,
         temperature: float = 0.3,
         max_tokens: int = 800,
         timeout_sec: float = 30.0,
         api_key: str | None = None,
     ) -> None:
-        self.provider = provider.lower()
+        self.model = model or "claude-sonnet-4-6"
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.timeout_sec = timeout_sec
+        self._client = self._init_client(api_key)
 
-        if self.provider == "anthropic":
-            self.model = model or "claude-sonnet-4-6"
-            self._client = self._init_anthropic(api_key)
-        elif self.provider == "openai":
-            self.model = model or "gpt-4o"
-            self._client = self._init_openai(api_key)
-        else:
-            raise ValueError(f"Unsupported provider: {provider}. Use 'anthropic' or 'openai'.")
-
-    def _init_anthropic(self, api_key: str | None):
+    def _init_client(self, api_key: str | None):
         try:
             import anthropic
         except ImportError as e:
             raise ImportError("anthropic package not installed. Run: pip install anthropic") from e
         key = api_key or os.environ.get("ANTHROPIC_API_KEY", "")
-        return anthropic.Anthropic(api_key=key)
-
-    def _init_openai(self, api_key: str | None):
-        try:
-            import openai
-        except ImportError as e:
-            raise ImportError("openai package not installed. Run: pip install openai") from e
-        key = api_key or os.environ.get("OPENAI_API_KEY", "")
-        return openai.OpenAI(api_key=key)
+        return __import__("anthropic").Anthropic(api_key=key)
 
     def call(self, system_prompt: str, user_message: str) -> LLMResponse:
-        start = time.monotonic()
-        if self.provider == "anthropic":
-            fn = lambda: self._call_anthropic(system_prompt, user_message, start)
-        else:
-            fn = lambda: self._call_openai(system_prompt, user_message, start)
-
+        fn = lambda: self._call_anthropic(system_prompt, user_message, time.monotonic())
         return _call_with_timeout(fn, self.timeout_sec)
 
     def _call_anthropic(self, system_prompt: str, user_message: str, start: float) -> LLMResponse:
@@ -110,27 +88,6 @@ class LLMClient:
             content=response.content[0].text,
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
-            model=self.model,
-            latency_ms=latency,
-        )
-
-    def _call_openai(self, system_prompt: str, user_message: str, start: float) -> LLMResponse:
-        response = self._client.chat.completions.create(
-            model=self.model,
-            max_tokens=self.max_tokens,
-            temperature=self.temperature,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
-        )
-        latency = (time.monotonic() - start) * 1000
-        choice = response.choices[0]
-        usage = response.usage
-        return LLMResponse(
-            content=choice.message.content or "",
-            input_tokens=usage.prompt_tokens,
-            output_tokens=usage.completion_tokens,
             model=self.model,
             latency_ms=latency,
         )

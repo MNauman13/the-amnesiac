@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python)
 ![Tests](https://img.shields.io/badge/tests-95%20passing-brightgreen?style=flat-square)
 ![Tasks](https://img.shields.io/badge/tasks-T1%20through%20T6-orange?style=flat-square)
-![Providers](https://img.shields.io/badge/LLM-Claude%20%7C%20GPT--4o-purple?style=flat-square)
+![Model](https://img.shields.io/badge/Model-claude--sonnet--4--6-blueviolet?style=flat-square&logo=anthropic)
 
 ---
 
@@ -31,7 +31,7 @@ git clone https://github.com/MNauman13/the-amnesiac.git
 cd the-amnesiac
 pip install -r requirements.txt
 cp .env.example .env
-# Add your ANTHROPIC_API_KEY (or OPENAI_API_KEY) to .env
+# Add your ANTHROPIC_API_KEY to .env
 ```
 
 Then run:
@@ -62,11 +62,8 @@ Tasks escalate in difficulty. Each one stresses a different memory skill.
 ## Running Commands
 
 ```bash
-# Run a single task (Claude, default settings)
+# Run a single task
 python main.py t1
-
-# Run with GPT-4o instead
-python main.py t2 --provider openai
 
 # Run the expert task with adversarial false events injected
 python main.py t6 --adversarial
@@ -93,8 +90,7 @@ cd viz && npm install && npm run dev
 | Flag | Default | Description |
 |---|---|---|
 | `task` | required | Task ID: `t1` through `t6` |
-| `--provider` | `anthropic` | `anthropic` or `openai` |
-| `--model` | auto | Model override (e.g. `claude-haiku-4-5-20251001`) |
+| `--model` | `claude-sonnet-4-6` | Model override |
 | `--temperature` | `0.3` | LLM temperature |
 | `--seed` | `42` | World RNG seed |
 | `--max-steps` | task default | Override the step limit |
@@ -202,7 +198,7 @@ The system has 5 layers. Each one has a single job.
 | **L1** | `world/engine.py` | Ground truth state; action processing; world physics |
 | **L2** | `agent/observation.py` | Converts world state to structured text the LLM can read |
 | **L3** | `agent/memory.py` | 2,048-byte scroll; UTF-8 byte enforcement; 3-version history |
-| **L4** | `agent/harness.py` | Runs the loop; calls the LLM; parses responses; logs everything |
+| **L4** | `agent/harness.py` | Runs the loop; calls Claude; parses responses; logs everything |
 | **L5** | `evaluation/scorer.py` | Scores task completion, memory efficiency, and step efficiency |
 
 ---
@@ -228,7 +224,7 @@ the-amnesiac/
 │   ├── null_memory.py         NullMemoryScroll: always-empty scroll for comparisons
 │   ├── observation.py         render_observation(): world state to text block
 │   ├── parser.py              parse_response(): ACTION + MEMORY_UPDATE extraction
-│   ├── llm.py                 LLMClient: Anthropic + OpenAI, timeout, prompt caching
+│   ├── llm.py                 LLMClient: Anthropic SDK, timeout, prompt caching
 │   └── harness.py             AgentHarness: the main loop
 │
 ├── evaluation/
@@ -419,8 +415,7 @@ Drop it in `tasks/` and run `python main.py tx`.
 ## Requirements
 
 ```
-anthropic>=0.30
-openai>=1.30
+anthropic>=0.40
 python-dotenv>=1.0
 pytest>=8.0
 ```

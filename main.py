@@ -51,7 +51,6 @@ def run(args: argparse.Namespace) -> None:
     engine = WorldEngine(config, seed=args.seed)
     memory = MemoryScroll()
     llm = LLMClient(
-        provider=args.provider,
         model=args.model or None,
         temperature=args.temperature,
         max_tokens=args.max_tokens,
@@ -99,13 +98,7 @@ def main() -> None:
         "--adversarial", action="store_true",
         help="Enable adversarial mode: inject false events to test memory robustness",
     )
-    parser.add_argument(
-        "--provider",
-        default="anthropic",
-        choices=["anthropic", "openai"],
-        help="LLM provider (default: anthropic)",
-    )
-    parser.add_argument("--model", default=None, help="Model override")
+    parser.add_argument("--model", default=None, help="Model override (default: claude-sonnet-4-6)")
     parser.add_argument(
         "--temperature", type=float, default=0.3, help="LLM temperature (default: 0.3)"
     )

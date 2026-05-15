@@ -87,8 +87,7 @@ def main() -> None:
         description="THE AMNESIAC — comparative mode: memory-enabled vs memory-wiped"
     )
     parser.add_argument("task", help="Task ID (t1–t6)")
-    parser.add_argument("--provider", default="anthropic", choices=["anthropic", "openai"])
-    parser.add_argument("--model", default=None)
+    parser.add_argument("--model", default=None, help="Model override (default: claude-sonnet-4-6)")
     parser.add_argument("--temperature", type=float, default=0.3)
     parser.add_argument("--max-tokens", type=int, default=800, dest="max_tokens")
     parser.add_argument("--api-key", default=None, dest="api_key")
@@ -98,7 +97,6 @@ def main() -> None:
 
     from agent.llm import LLMClient
     llm = LLMClient(
-        provider=args.provider,
         model=args.model,
         temperature=args.temperature,
         max_tokens=args.max_tokens,
