@@ -16,7 +16,47 @@
     "difficultyColor": "#eab308",
     "description": "Agent collects 4 fragments across 3 rooms and returns to the assembly zone.",
     "file": "run_t2.jsonl",
-    "score": 0.911,
-    "steps": 48
+    "score": 0.863,
+    "steps": 83
+  },
+  {
+    "id": "t3",
+    "label": "T3 — Moving Target",
+    "difficulty": "Medium",
+    "difficultyColor": "#eab308",
+    "description": "Agent chases a drifting token that moves every 3 steps. Must pick it up before it gets out of reach.",
+    "file": "run_t3.jsonl",
+    "score": 0.929,
+    "steps": 5
+  },
+  {
+    "id": "t4",
+    "label": "T4 — Cartographer",
+    "difficulty": "Hard",
+    "difficultyColor": "#f97316",
+    "description": "Agent must visit all 5 rooms (hub + 4 wings) with a door that re-locks periodically.",
+    "file": "run_t4.jsonl",
+    "score": 0.933,
+    "steps": 31
+  },
+  {
+    "id": "t5",
+    "label": "T5 — Relay Race",
+    "difficulty": "Hard",
+    "difficultyColor": "#f97316",
+    "description": "Agent carries a fragile relic through 4 rooms and delivers it within 50 steps. Drop it and the run fails.",
+    "file": "run_t5.jsonl",
+    "score": 0.925,
+    "steps": 13
+  },
+  {
+    "id": "t6",
+    "label": "T6 — The Labyrinth",
+    "difficulty": "Expert",
+    "difficultyColor": "#dc2626",
+    "description": "Corridors reshuffle every 10 steps in a 5-room labyrinth. The agent must collect 3 fragments while the map keeps changing.",
+    "file": "run_t6.jsonl",
+    "score": 0.927,
+    "steps": 83
   }
 ]
