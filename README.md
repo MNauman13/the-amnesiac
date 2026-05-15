@@ -7,6 +7,8 @@
 ![Tasks](https://img.shields.io/badge/tasks-T1%20through%20T6-orange?style=flat-square)
 ![Model](https://img.shields.io/badge/Model-claude--sonnet--4--6-blueviolet?style=flat-square&logo=anthropic)
 
+**Live demo: [the-amnesiac-0515.vercel.app](https://the-amnesiac-0515.vercel.app/)**
+
 ---
 
 ## What Is This?
