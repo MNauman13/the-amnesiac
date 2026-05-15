@@ -10,7 +10,7 @@ import WorldGridPanel from "./WorldGridPanel";
 export default function StepViewer({ steps, autoPlay = false }) {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [speedMs, setSpeedMs] = useState(1000);
+  const [speedMs, setSpeedMs] = useState(1500);
   const [showObs, setShowObs] = useState(false);
 
   useEffect(() => {

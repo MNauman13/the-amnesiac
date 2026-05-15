@@ -7,8 +7,6 @@
 ![Tasks](https://img.shields.io/badge/tasks-T1%20through%20T6-orange?style=flat-square)
 ![Providers](https://img.shields.io/badge/LLM-Claude%20%7C%20GPT--4o-purple?style=flat-square)
 
-**Humanoid Robotics Internship Challenge · Summer 2026**
-
 ---
 
 ## What Is This?
@@ -276,8 +274,6 @@ A score above 0.75 across the benchmark suite indicates a strong agent. Task com
 ---
 
 ## Design Choices
-
-> These address the things the Humanoid team said they care about.
 
 ### The Agent Harness
 

@@ -8,10 +8,10 @@ const btn = {
 };
 
 const SPEEDS = [
-  { label: "0.5x", ms: 2000 },
-  { label: "1x",   ms: 1000 },
-  { label: "2x",   ms: 500  },
-  { label: "4x",   ms: 250  },
+  { label: "0.5x", ms: 3000 },
+  { label: "1x",   ms: 1500 },
+  { label: "2x",   ms: 750  },
+  { label: "4x",   ms: 375  },
 ];
 
 export default function StepControls({
